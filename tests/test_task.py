@@ -1,7 +1,6 @@
 import pytest
 from pages.sbis.main_page import MainPage as SbisMainPage
 
-@pytest.mark.skip
 def test_first(driver):
   page = SbisMainPage(driver)
   page.open()
@@ -16,7 +15,6 @@ def test_first(driver):
   page.should_be_current_page()
   page.should_be_same_size_images()
 
-@pytest.mark.skip
 def test_second(driver):
   default_region_title = 'Калининградская обл'
 
