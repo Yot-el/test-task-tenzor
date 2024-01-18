@@ -29,28 +29,34 @@ class DownloadPage(BasePage):
     tab_content = self.driver.find_element(*DownloadPageLocators.ACTIVE_TAB)
     return tab_content
   
-  def download_web_plugin(self, timeout=5):
+  def download_web_plugin(self, filename, timeout=5):
     link = self.driver.find_element(*DownloadPageLocators.DOWNLOAD_PLUGIN_LINK)
     link.click()
 
-    time.sleep(timeout)
+    time_step = 1
+    while timeout > 0:
+      if not (self.is_file_downloaded(filename)):
+        timeout -= time_step
+        time.sleep(time_step)
+
+    if (self.is_file_downloaded(self, filename)):
+      return
+    
+    raise Exception(f"File {filename} failed to load in {timeout} seconds")
+
+  def is_file_downloaded(self, filename):
+    path = f'{os.getcwd()}\\tests\\{filename}'
+
+    return (os.path.exists(path))
 
   def should_be_same_size_file(self, filename):
     link = self.driver.find_element(*DownloadPageLocators.DOWNLOAD_PLUGIN_LINK)
+    path = f'{os.getcwd()}\\tests\\{filename}'
+
     size = float(re.findall(r'\d+\.\d+', link.text)[0])
-    path = f'{os.getcwd()}\\tests'
+    file_size = round(os.path.getsize(path) / 1024 ** 2, 2)
 
-    os.chdir(path)
-    files = [f for f in os.listdir('.') if os.path.isfile(f)]
+    os.remove(path)
 
-    for f in files:
-      if f == filename:
-        f_size = round(os.stat(f).st_size / 1024 ** 2, 2)
-        os.remove(f)
-
-        assert f_size == size, \
-          f"Downloaded {filename} have wrong size, expected {size}, got {f_size}"
-
-        return
-    
-    raise Exception(f"{filename} not found in tests directory")
+    assert size == file_size, \
+      f"Size of {filename} expected to be {size}, got {file_size}"

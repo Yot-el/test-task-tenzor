@@ -45,5 +45,5 @@ def test_third(driver):
 
   filename = 'sbisplugin-setup-web.exe'
   page.change_active_tab('plugin')
-  page.download_web_plugin()
+  page.download_web_plugin(filename, 15)
   page.should_be_same_size_file(filename)
